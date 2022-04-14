@@ -11,7 +11,7 @@ typedef struct
     char nombre [30];
     char tipo [30];
     char marca [30];
-    long stock;
+    int stock;
     int precio;
 } tipoProducto;
 
@@ -25,14 +25,14 @@ typedef struct
 {
     List* listaProductos;
     int cantidadProductos;
-    long precioTotal;
+    int precioTotal;
 } tipoCarrito;
 
 void importarProductos(char* nombreArchivo);
 
 void exportarProductos(char* nombreArchivo);
 
-void agregarProducto(char* nombre, char* tipo, char* marca, long stock, int precio);
+void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int precio);
 
 void buscarProductosTipo(HashMap* map, char* tipo);
 
@@ -42,17 +42,18 @@ void buscarProductosNombre(HashMap* map, char* nombre);
 
 void mostrarProductos(HashMap* map);
 
-void agregaProductosCarrito(tipoCarrito* carrito, tipoProductoCompra* producto);
+void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarrito);
 
-void eliminaProductosCarrito(tipoCarrito* carrito);
+void eliminarProductoCarrito(tipoCarrito* carrito);
 
 void concretarCompra(tipoCarrito* carrito);
 
-void mostrarCarritos(HashMap* map);
+void mostrarCarritos();
 
 // Funciones auxiliares
 void mostrarInfoProducto(tipoProducto *producto);
-tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, long stock, int precio);
+tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, int stock, int precio);
+tipoCarrito *crearCarrito(char *nombre);
 
 // Variables globales
 HashMap* mapaTipo;
@@ -67,11 +68,13 @@ int main()
     mapaNombre = createMap(200);
     mapaCarritos = createMap(200);
 
-    char nombre [30];
+    char nombreProducto [30];
     char tipo [30];
     char marca [30];
-    long stock;
+    int stock;
     int precio;
+    char nombreCarrito [30];
+    int cantidad;
 
     int opcion = 0;
 
@@ -98,7 +101,7 @@ int main()
         {
             case 3:
                 printf("Ingrese el nombre del producto: ");
-                scanf("%[^\n]", nombre);
+                scanf("%[^\n]", nombreProducto);
                 fflush(stdin);
                 printf("Ingrese el tipo del producto: ");
                 scanf("%[^\n]", tipo);
@@ -110,15 +113,28 @@ int main()
                 scanf("%d", &stock);
                 printf("Ingrese el precio del producto: ");
                 scanf("%d", &precio);
-                agregarProducto(nombre, tipo, marca, stock, precio);
+                agregarProducto(nombreProducto, tipo, marca, stock, precio);
                 printf("\n");
                 break;
             case 4:
                 printf("Ingrese el tipo de producto: ");
                 scanf("%[^\n]", tipo);
+                fflush(stdin);
                 buscarProductosTipo(mapaTipo, tipo);
                 break;
-            case 11: 
+            case 8:
+                printf("Ingrese el nombre del producto: ");
+                scanf("%[^\n]", nombreProducto);
+                fflush(stdin);
+                printf("Ingrese la cantidad del producto: ");
+                scanf("%d", &cantidad);
+                fflush(stdin);
+                printf("Ingrese el nombre del carrito: ");
+                scanf("%[^\n]", nombreCarrito);
+                fflush(stdin);
+                agregarProductoCarrito(nombreProducto, cantidad, nombreCarrito);
+                break;
+            case 12: 
                 exit(EXIT_SUCCESS); // Salir de la aplicacion
         }
     }
@@ -126,7 +142,7 @@ int main()
     return 0;
 }
 
-tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, long stock, int precio)
+tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, int stock, int precio)
 {
     tipoProducto *producto = (tipoProducto *) malloc(sizeof(tipoProducto));
     strcpy(producto->nombre, nombre);
@@ -137,7 +153,7 @@ tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, long stock, i
     return producto;
 }
 
-void agregarProducto(char* nombre, char* tipo, char* marca, long stock, int precio)
+void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int precio)
 {
     Pair *pair = searchMap(mapaNombre, nombre);
     if(pair)
@@ -197,4 +213,47 @@ void mostrarInfoProducto(tipoProducto *producto)
     printf("Tipo: %s\n", producto->tipo);
     printf("Stock: %d\n", producto->stock);
     printf("Precio: %d\n\n", producto->precio);
+}
+
+tipoCarrito *crearCarrito(char *nombre)
+{
+    tipoCarrito *carrito = (tipoCarrito *) malloc(sizeof(tipoCarrito *));
+    carrito->listaProductos = createList();
+    carrito->cantidadProductos = 0;
+    carrito->precioTotal = 0;
+    insertMap(mapaCarritos, nombre, carrito);
+    return carrito;
+}
+
+void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarrito)
+{
+    Pair *pair = searchMap(mapaNombre, nombreProducto);
+    if(!pair)
+    {
+        printf("El producto ingresado no existe.\n\n");
+        return;
+    }
+
+    tipoProducto *producto = pair->value;
+    if(producto->stock < cantidad)
+    {
+        printf("No hay suficiente stock del producto.\n\n");
+        return;
+    }
+
+    tipoProductoCompra *productoCompra = (tipoProductoCompra*) malloc(sizeof(tipoProductoCompra));
+    strcpy(productoCompra->nombre, nombreProducto);
+    productoCompra->cantidad = cantidad;
+
+    pair = searchMap(mapaCarritos, nombreCarrito);
+    tipoCarrito *carrito;
+    if(pair)
+        carrito = pair->value;
+    else
+        carrito = crearCarrito(nombreCarrito);
+
+    pushFront(carrito->listaProductos, productoCompra);
+    carrito->cantidadProductos++;
+    carrito->precioTotal += (cantidad * producto->precio);
+    printf("Se agregó el producto al carrito.\n\n");
 }

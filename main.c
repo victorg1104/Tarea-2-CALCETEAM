@@ -117,7 +117,9 @@ int main()
                 printf("Ingrese el tipo de producto: ");
                 scanf("%[^\n]", tipo);
                 buscarProductosTipo(mapaTipo, tipo);
-            case 11: exit(EXIT_SUCCESS); // Salir de la aplicacion
+                break;
+            case 11: 
+                exit(EXIT_SUCCESS); // Salir de la aplicacion
         }
     }
 
@@ -147,8 +149,32 @@ void agregarProducto(char* nombre, char* tipo, char* marca, long stock, int prec
     {
         tipoProducto *producto = crearProducto(nombre, tipo, marca, stock, precio);
         insertMap(mapaNombre, nombre, producto);
-        insertMap(mapaTipo, tipo, producto);
-        insertMap(mapaMarca, marca, producto);
+
+        pair = searchMap(mapaTipo, tipo);
+        if(pair)
+        {
+            List *listaTipo = pair->value;
+            pushFront(listaTipo, producto);
+        }
+        else
+        {
+            List *listaTipo = createList();
+            pushFront(listaTipo, producto);
+            insertMap(mapaTipo, tipo, listaTipo);
+        }
+
+        pair = searchMap(mapaMarca, marca);
+        if(pair)
+        {
+            List *listaMarca = pair->value;
+            pushFront(listaMarca, producto);
+        }
+        else
+        {
+            List *listaMarca = createList();
+            pushFront(listaMarca, producto);
+            insertMap(mapaMarca, marca, listaMarca);
+        }
     }
 }
 

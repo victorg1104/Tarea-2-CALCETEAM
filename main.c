@@ -32,7 +32,7 @@ void importarProductos(char* nombreArchivo);
 
 void exportarProductos(char* nombreArchivo);
 
-void agregaProducto(char* nombre, char* tipo, char* marca, long stock, int precio);
+void agregarProducto(char* nombre, char* tipo, char* marca, long stock, int precio);
 
 void buscarProductosTipo(HashMap* map, char* tipo);
 
@@ -51,16 +51,27 @@ void concretarCompra(tipoCarrito* carrito);
 void mostrarCarritos(HashMap* map);
 
 // Funciones auxiliares
-void mostrarInfoProducto(tipoProducto *);
+void mostrarInfoProducto(tipoProducto *producto);
+tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, long stock, int precio);
+
+// Variables globales
+HashMap* mapaTipo;
+HashMap* mapaMarca;
+HashMap* mapaNombre;
+HashMap* mapaCarritos;
 
 int main()
 {
-    HashMap* mapaTipo = createMap(200);
-    HashMap* mapaMarca = createMap(200);
-    HashMap* mapaNombre = createMap(200);
-    HashMap* mapaCarritos = createMap(200);
+    mapaTipo = createMap(200);
+    mapaMarca = createMap(200);
+    mapaNombre = createMap(200);
+    mapaCarritos = createMap(200);
 
-    char tipo[30];
+    char nombre [30];
+    char tipo [30];
+    char marca [30];
+    long stock;
+    int precio;
 
     int opcion = 0;
 
@@ -68,13 +79,13 @@ int main()
     {
         printf("1.-  Importar productos desde un archivo CSV\n");
         printf("2.-  Exportar productos CSV\n");
-        printf("3.-  Agregar producto\n"); // Funcionando
-        printf("4.-  Buscar producto por tipo\n"); // Funcionando
+        printf("3.-  Agregar producto\n");
+        printf("4.-  Buscar producto por tipo\n");
         printf("5.-  Buscar producto por marca\n");
         printf("6.-  Buscar producto por nombre\n");
-        printf("7.-  Mostrar todos los productos diponibles\n"); // Funcionando
-        printf("8.-  Agregar producto a un carrito\n"); // Funcionando
-        printf("9.-  Eliminar producto de un carrito\n"); // Funcionando
+        printf("7.-  Mostrar todos los productos diponibles\n");
+        printf("8.-  Agregar producto a un carrito\n");
+        printf("9.-  Eliminar producto de un carrito\n");
         printf("10.- Concretar compra\n");
         printf("11.- Mostrar todos los carritos\n");
         printf("12.- Salir\n\n");
@@ -85,6 +96,23 @@ int main()
 
         switch(opcion)
         {
+            case 3:
+                printf("Ingrese el nombre del producto: ");
+                scanf("%[^\n]", nombre);
+                fflush(stdin);
+                printf("Ingrese el tipo del producto: ");
+                scanf("%[^\n]", tipo);
+                fflush(stdin);
+                printf("Ingrese la marca del producto: ");
+                scanf("%[^\n]", marca);
+                fflush(stdin);
+                printf("Ingrese el stock del producto: ");
+                scanf("%d", &stock);
+                printf("Ingrese el precio del producto: ");
+                scanf("%d", &precio);
+                agregarProducto(nombre, tipo, marca, stock, precio);
+                printf("\n");
+                break;
             case 4:
                 printf("Ingrese el tipo de producto: ");
                 scanf("%[^\n]", tipo);
@@ -94,6 +122,34 @@ int main()
     }
 
     return 0;
+}
+
+tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, long stock, int precio)
+{
+    tipoProducto *producto = (tipoProducto *) malloc(sizeof(tipoProducto));
+    strcpy(producto->nombre, nombre);
+    strcpy(producto->tipo, tipo);
+    strcpy(producto->marca, marca);
+    producto->stock = stock;
+    producto->precio = precio;
+    return producto;
+}
+
+void agregarProducto(char* nombre, char* tipo, char* marca, long stock, int precio)
+{
+    Pair *pair = searchMap(mapaNombre, nombre);
+    if(pair)
+    {
+        tipoProducto *producto = pair->value;
+        producto->stock += stock;
+    }
+    else
+    {
+        tipoProducto *producto = crearProducto(nombre, tipo, marca, stock, precio);
+        insertMap(mapaNombre, nombre, producto);
+        insertMap(mapaTipo, tipo, producto);
+        insertMap(mapaMarca, marca, producto);
+    }
 }
 
 void buscarProductosTipo(HashMap *map, char *tipo)

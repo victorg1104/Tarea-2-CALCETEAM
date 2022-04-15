@@ -11,7 +11,7 @@ typedef struct
     char nombre [30];
     char tipo [30];
     char marca [30];
-    long stock;
+    int stock;
     int precio;
 } tipoProducto;
 
@@ -25,14 +25,14 @@ typedef struct
 {
     List* listaProductos;
     int cantidadProductos;
-    long precioTotal;
+    int precioTotal;
 } tipoCarrito;
 
 void importarProductos(char* nombreArchivo);
 
 void exportarProductos(char* nombreArchivo);
 
-void agregaProducto(char* nombre, char* tipo, char* marca, long stock, int precio);
+void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int precio);
 
 void buscarProductosTipo(HashMap* map, char* tipo);
 
@@ -42,21 +42,39 @@ void buscarProductosNombre(HashMap* map, char* nombre);
 
 void mostrarProductos(HashMap* map);
 
-void agregaProductosCarrito(tipoCarrito* carrito, tipoProductoCompra* producto);
+void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarrito);
 
-void eliminaProductosCarrito(tipoCarrito* carrito);
+void eliminarProductoCarrito(tipoCarrito* carrito);
 
 void concretarCompra(tipoCarrito* carrito);
 
-void mostrarCarritos(HashMap* map);
+void mostrarCarritos();
 
+// Funciones auxiliares
+void mostrarInfoProducto(tipoProducto *producto);
+tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, int stock, int precio);
+tipoCarrito *crearCarrito(char *nombre);
+
+// Variables globales
+HashMap* mapaTipo;
+HashMap* mapaMarca;
+HashMap* mapaNombre;
+HashMap* mapaCarritos;
 
 int main()
 {
-    HashMap* mapaTipo = createMap(200);
-    HashMap* mapaMarca = createMap(200);
-    HashMap* mapaNombre = createMap(200);
-    HashMap* mapaCarritos = createMap(200);
+    mapaTipo = createMap(200);
+    mapaMarca = createMap(200);
+    mapaNombre = createMap(200);
+    mapaCarritos = createMap(200);
+
+    char nombreProducto [30];
+    char tipo [30];
+    char marca [30];
+    int stock;
+    int precio;
+    char nombreCarrito [30];
+    int cantidad;
 
     int opcion = 0;
 
@@ -64,13 +82,13 @@ int main()
     {
         printf("1.-  Importar productos desde un archivo CSV\n");
         printf("2.-  Exportar productos CSV\n");
-        printf("3.-  Agregar producto\n"); // Funcionando
-        printf("4.-  Buscar producto por tipo\n"); // Funcionando
+        printf("3.-  Agregar producto\n");
+        printf("4.-  Buscar producto por tipo\n");
         printf("5.-  Buscar producto por marca\n");
         printf("6.-  Buscar producto por nombre\n");
-        printf("7.-  Mostrar todos los productos diponibles\n"); // Funcionando
-        printf("8.-  Agregar producto a un carrito\n"); // Funcionando
-        printf("9.-  Eliminar producto de un carrito\n"); // Funcionando
+        printf("7.-  Mostrar todos los productos diponibles\n");
+        printf("8.-  Agregar producto a un carrito\n");
+        printf("9.-  Eliminar producto de un carrito\n");
         printf("10.- Concretar compra\n");
         printf("11.- Mostrar todos los carritos\n");
         printf("12.- Salir\n\n");
@@ -81,59 +99,161 @@ int main()
 
         switch(opcion)
         {
-            case 1: 
-                importarProductos();
-            break;  // Importar canciones
-            case 2:
-                e 
-            break;  // Exportar canciones
             case 3:
-                agregarCancion();
-                break;  // Agregar cancion
-            case 4:
+                printf("Ingrese el nombre del producto: ");
+                scanf("%[^\n]", nombreProducto);
                 fflush(stdin);
-                printf("Ingrese el nombre de la cancion: ");
-                scanf("%[^\n]", nombre);
-                resultadoBusqueda = buscarCancionNombre(nombre);
-                if(resultadoBusqueda != NULL)
-                {
-                    printf("Cancion encontrada: \n");
-                    mostrarInfoCancion(resultadoBusqueda);
-                } else {
-                    printf("No se encontro la cancion\n");
-                }
-                break;  // Buscar por nombre
-            case 5: break;  // Buscar por artista
-            case 6: break;  // Buscar por genero
-            case 7: // Eliminar cancion
-                printf("Ingrese el nombre de la cancion: ");
-                scanf("%[^\n]", nombre);
+                printf("Ingrese el tipo del producto: ");
+                scanf("%[^\n]", tipo);
                 fflush(stdin);
-                printf("Ingrese el artista de la cancion: ");
-                scanf("%[^\n]", artista);
+                printf("Ingrese la marca del producto: ");
+                scanf("%[^\n]", marca);
                 fflush(stdin);
-                printf("Ingrese el año de la cancion: ");
-                scanf("%d", &anio);
-                fflush(stdin);
-                eliminarCancion(nombre, artista, anio);
+                printf("Ingrese el stock del producto: ");
+                scanf("%d", &stock);
+                printf("Ingrese el precio del producto: ");
+                scanf("%d", &precio);
+                agregarProducto(nombreProducto, tipo, marca, stock, precio);
+                printf("\n");
                 break;
-            case 8: // Mostrar nombres listas
-                mostrarListasReproduccion();
-                break;  
-            case 9: // Mostrar canciones lista
-                printf("Ingrese el nombre de la lista: ");
-                scanf("%[^\n]", nombre);
+            case 4:
+                printf("Ingrese el tipo de producto: ");
+                scanf("%[^\n]", tipo);
                 fflush(stdin);
-                mostrarCancionesPorLista(nombre);
-                break; 
-            case 10: // Mostrar todas las canciones
-                mostrarCanciones();
-                break;       
-            case 11: exit(EXIT_SUCCESS); // Salir de la aplicacion
+                buscarProductosTipo(mapaTipo, tipo);
+                break;
+            case 8:
+                printf("Ingrese el nombre del producto: ");
+                scanf("%[^\n]", nombreProducto);
+                fflush(stdin);
+                printf("Ingrese la cantidad del producto: ");
+                scanf("%d", &cantidad);
+                fflush(stdin);
+                printf("Ingrese el nombre del carrito: ");
+                scanf("%[^\n]", nombreCarrito);
+                fflush(stdin);
+                agregarProductoCarrito(nombreProducto, cantidad, nombreCarrito);
+                break;
+            case 12: 
+                exit(EXIT_SUCCESS); // Salir de la aplicacion
+        }
     }
-
 
     return 0;
 }
 
-void concretarCompra(tipoCarrito* carrito);
+tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, int stock, int precio)
+{
+    tipoProducto *producto = (tipoProducto *) malloc(sizeof(tipoProducto));
+    strcpy(producto->nombre, nombre);
+    strcpy(producto->tipo, tipo);
+    strcpy(producto->marca, marca);
+    producto->stock = stock;
+    producto->precio = precio;
+    return producto;
+}
+
+void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int precio)
+{
+    Pair *pair = searchMap(mapaNombre, nombre);
+    if(pair)
+    {
+        tipoProducto *producto = pair->value;
+        producto->stock += stock;
+    }
+    else
+    {
+        tipoProducto *producto = crearProducto(nombre, tipo, marca, stock, precio);
+        insertMap(mapaNombre, nombre, producto);
+
+        pair = searchMap(mapaTipo, tipo);
+        if(pair)
+        {
+            List *listaTipo = pair->value;
+            pushFront(listaTipo, producto);
+        }
+        else
+        {
+            List *listaTipo = createList();
+            pushFront(listaTipo, producto);
+            insertMap(mapaTipo, tipo, listaTipo);
+        }
+
+        pair = searchMap(mapaMarca, marca);
+        if(pair)
+        {
+            List *listaMarca = pair->value;
+            pushFront(listaMarca, producto);
+        }
+        else
+        {
+            List *listaMarca = createList();
+            pushFront(listaMarca, producto);
+            insertMap(mapaMarca, marca, listaMarca);
+        }
+    }
+}
+
+void buscarProductosTipo(HashMap *map, char *tipo)
+{
+    Pair *pair = searchMap(map, tipo);
+    List *listaProductos = pair->value;
+    tipoProducto *producto = firstList(listaProductos);
+    while(producto)
+    {
+        mostrarInfoProducto(producto);
+        producto = nextList(listaProductos);
+    }
+}
+
+void mostrarInfoProducto(tipoProducto *producto)
+{
+    printf("Nombre: %s\n", producto->nombre);
+    printf("Marca: %s\n", producto->marca);
+    printf("Tipo: %s\n", producto->tipo);
+    printf("Stock: %d\n", producto->stock);
+    printf("Precio: %d\n\n", producto->precio);
+}
+
+tipoCarrito *crearCarrito(char *nombre)
+{
+    tipoCarrito *carrito = (tipoCarrito *) malloc(sizeof(tipoCarrito *));
+    carrito->listaProductos = createList();
+    carrito->cantidadProductos = 0;
+    carrito->precioTotal = 0;
+    insertMap(mapaCarritos, nombre, carrito);
+    return carrito;
+}
+
+void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarrito)
+{
+    Pair *pair = searchMap(mapaNombre, nombreProducto);
+    if(!pair)
+    {
+        printf("El producto ingresado no existe.\n\n");
+        return;
+    }
+
+    tipoProducto *producto = pair->value;
+    if(producto->stock < cantidad)
+    {
+        printf("No hay suficiente stock del producto.\n\n");
+        return;
+    }
+
+    tipoProductoCompra *productoCompra = (tipoProductoCompra*) malloc(sizeof(tipoProductoCompra));
+    strcpy(productoCompra->nombre, nombreProducto);
+    productoCompra->cantidad = cantidad;
+
+    pair = searchMap(mapaCarritos, nombreCarrito);
+    tipoCarrito *carrito;
+    if(pair)
+        carrito = pair->value;
+    else
+        carrito = crearCarrito(nombreCarrito);
+
+    pushFront(carrito->listaProductos, productoCompra);
+    carrito->cantidadProductos++;
+    carrito->precioTotal += (cantidad * producto->precio);
+    printf("Se agregó el producto al carrito.\n\n");
+}

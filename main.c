@@ -268,33 +268,49 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
 
 void concretarCompra(char* nombreCarrito)
 {
+    Pair* pair;
     tipoCarrito* carrito;
     tipoProductoCompra* productoCarrito;
     tipoProducto* productoStock;
     int respuesta;
+    int cont = 0;
 
-    carrito = (tipoCarrito *) searchMap(mapaCarritos, nombreCarrito);
+    pair = searchMap(mapaCarritos, nombreCarrito);
 
-    if(carrito!=NULL)
+    if(pair)
     {
+        carrito = pair->value;
+
         printf("Total a pagar: %d\n", carrito->precioTotal);
 
         printf("Productos dentro del carrito: \n");
 
-        while (productoCarrito!=NULL)
+        while (cont < carrito->cantidadProductos);
         {
             productoCarrito = (tipoProductoCompra *) firstList(carrito->listaProductos);
-            productoStock = (tipoProducto *) searchMap(mapaNombre, productoCarrito->nombre);
 
-            printf("-%s, cantidad: %d\n", productoCarrito->nombre, productoCarrito->cantidad);
+            if(productoCarrito != NULL)
+            {
+                productoStock = (tipoProducto *) searchMap(mapaNombre, productoCarrito->nombre);
 
-            productoStock->stock -= productoCarrito->cantidad;
-            popFront(carrito->listaProductos); 
+                printf("-%s, cantidad: %d\n", productoCarrito->nombre, productoCarrito->cantidad);
+
+                productoStock->stock -= productoCarrito->cantidad;
+                popFront(carrito->listaProductos);
+
+                cont++;
+            }
         }
 
-        printf("¿Quiere concretar la compra?\n");
-        printf("1.- Sí // 2.- No");
-        scanf("%d", &respuesta);
+        if (carrito->cantidadProductos == 0)
+            printf("El carrito está vacío");
+        
+        if(carrito->cantidadProductos != 0)
+        {
+            printf("¿Quiere concretar la compra?\n");
+            printf("1.- Sí // 2.- No");
+            scanf("%d", &respuesta);
+        }
 
         if(respuesta == 1)
             eraseMap(mapaCarritos, nombreCarrito);

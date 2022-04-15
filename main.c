@@ -46,7 +46,7 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
 
 void eliminarProductoCarrito(tipoCarrito* carrito);
 
-void concretarCompra(tipoCarrito* carrito);
+void concretarCompra(char* carrito);
 
 void mostrarCarritos();
 
@@ -133,6 +133,14 @@ int main()
                 scanf("%[^\n]", nombreCarrito);
                 fflush(stdin);
                 agregarProductoCarrito(nombreProducto, cantidad, nombreCarrito);
+                break;
+
+            case 10:
+                printf("Ingrese el nombre del carrito: ");
+                scanf("%[^\n]", nombreCarrito);
+                fflush(stdin);
+
+                concretarCompra(nombreCarrito);
                 break;
             case 12: 
                 exit(EXIT_SUCCESS); // Salir de la aplicacion
@@ -256,4 +264,42 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
     carrito->cantidadProductos++;
     carrito->precioTotal += (cantidad * producto->precio);
     printf("Se agregó el producto al carrito.\n\n");
+}
+
+void concretarCompra(char* nombreCarrito)
+{
+    tipoCarrito* carrito;
+    tipoProductoCompra* productoCarrito;
+    tipoProducto* productoStock;
+    int respuesta;
+
+    carrito = (tipoCarrito *) searchMap(mapaCarritos, nombreCarrito);
+
+    if(carrito!=NULL)
+    {
+        printf("Total a pagar: %d\n", carrito->precioTotal);
+
+        printf("Productos dentro del carrito: \n");
+
+        while (productoCarrito!=NULL)
+        {
+            productoCarrito = (tipoProductoCompra *) firstList(carrito->listaProductos);
+            productoStock = (tipoProducto *) searchMap(mapaNombre, productoCarrito->nombre);
+
+            printf("-%s, cantidad: %d\n", productoCarrito->nombre, productoCarrito->cantidad);
+
+            productoStock->stock -= productoCarrito->cantidad;
+            popFront(carrito->listaProductos); 
+        }
+
+        printf("¿Quiere concretar la compra?\n");
+        printf("1.- Sí // 2.- No");
+        scanf("%d", &respuesta);
+
+        if(respuesta == 1)
+            eraseMap(mapaCarritos, nombreCarrito);
+    }
+    else
+        printf("No se encontró el carrito buscado");
+    
 }

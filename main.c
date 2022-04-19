@@ -28,6 +28,8 @@ typedef struct
     int precioTotal;
 } tipoCarrito;
 
+char *get_csv_field (char * tmp, int k);
+
 void importarProductos(char* nombreArchivo);
 
 void exportarProductos(char* nombreArchivo);
@@ -71,6 +73,7 @@ int main()
     char nombreProducto [30];
     char tipo [30];
     char marca [30];
+    char nombre [30];
     int stock;
     int precio;
     char nombreCarrito [30];
@@ -99,6 +102,20 @@ int main()
 
         switch(opcion)
         {
+            case 1:// Importar productos
+                fflush(stdin);
+                printf("Ingrese el nombre del archivo: ");
+                scanf("%[^\n]", nombre);
+                importarCanciones(nombre);
+            break;
+
+            case 2: // Exportar productos
+                fflush(stdin);
+                printf("Ingrese el nombre del archivo: ");
+                scanf("%[^\n]", nombre);
+                exportarCanciones(nombre);
+                break;
+
             case 3:
                 printf("Ingrese el nombre del producto: ");
                 scanf("%[^\n]", nombreProducto);
@@ -148,6 +165,114 @@ int main()
     }
 
     return 0;
+}
+
+char *get_csv_field(char *linea, int indice)
+{
+    char *campo = (char *) malloc(100 * sizeof(char *)); // Guarda el string a retornar
+    int i = 0; // Recorre la linea
+    int k = 0; // Cuenta las comas
+    int n = 0; // Recorre el campo
+    bool comillas = false;
+
+    while(linea[i] != '\0')
+    {
+        if(linea[i] == '\"')
+        {
+            comillas = !comillas;
+        }
+
+        if(k == indice)
+        {
+            if(linea[i] != '\"')
+            {
+                campo[n] = linea[i];
+                n++;
+            }
+        }
+
+        i++;
+
+        if(linea[i] == ',' && !comillas)
+        {
+            k++;
+            i++;
+        }
+
+        if(k > indice || linea[i] == '\0' || linea[i] == '\n')
+        {
+            campo[n] = '\0';
+            return campo;
+        }
+    }
+
+    return NULL;
+}
+
+void importarProductos(char* nombreArchivo)
+{
+    FILE* archivoEntrada;
+    Pair* pair;
+    tipoProducto* aux;
+
+    archivoEntrada = fopen(nombreArchivo, "r");
+
+    if(archivoEntrada == NULL)
+    {
+        printf("Error al importar archivo .csv");
+        exit(EXIT_FAILURE);
+    }
+
+    char linea[1024];
+
+    while (fgets (linea, 1023, archivoEntrada) != NULL) 
+    {
+        // Se guardan los datos según el campo que se recibe
+        char *nombre = get_csv_field(linea, 0);
+        char *tipo = get_csv_field(linea, 2);
+        char *marca = get_csv_field(linea, 1);
+        int stock = atoi(get_csv_field(linea, 3));
+        int precio = get_csv_field(linea, 4);
+
+        pair = searchMap(mapaNombre, nombre);
+
+        if (pair)
+        {
+            aux = (tipoProducto*) pair->value;
+            aux->stock += stock;
+        }
+        else
+        {
+            aux = crearProducto(nombre, tipo, marca, stock, precio);
+            insertMap(mapaNombre, aux->nombre, aux);
+            insertMap(mapaMarca, aux->marca, aux);
+            insertMap(mapaTipo, aux->tipo, aux);
+        }
+    }
+
+    fclose(archivoEntrada);
+    printf("\n");
+}
+
+void exportarProductos(char *nombreArchivo)
+{
+    FILE *archivo = fopen(nombreArchivo, "w"); 
+    if(!archivo)
+    {
+        printf("No se pudo crear el archivo\n");
+        return;
+    }
+
+    tipoProducto* producto = firstMap(mapaNombre); 
+    while(producto)
+    {
+        fprintf(archivo, "%s,%s,%s,%d,%d", producto->nombre, producto->marca, producto->tipo, producto->stock, producto->precio);
+
+        producto = nextMap(mapaNombre);
+    }
+
+    fclose(archivo);
+    printf("\n");
 }
 
 tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, int stock, int precio)

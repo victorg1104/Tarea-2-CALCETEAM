@@ -335,37 +335,37 @@ void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int preci
 void buscarProductosTipo(HashMap *map, char *tipo)
 {
     Pair *pair = searchMap(map, tipo);
+    if(!pair)
+    {
+        printf("No se encontraron productos del tipo ingresado\n\n");
+        return;
+    }
+
     List *listaProductos = pair->value;
     tipoProducto *producto = firstList(listaProductos);
-    int cont = 0;
-
     while(producto)
     {
         mostrarInfoProducto(producto);
         producto = nextList(listaProductos);
-        cont++;
     }
-
-    if(cont == 0)
-        printf("No se encontraron productos del tipo ingresado\n");
 }
 
 void buscarProductosMarca(HashMap* map, char* marca)
 {
     Pair *pair = searchMap(map, marca);
+    if(!pair)
+    {
+        printf("No se encontraron productos de la marca ingresada\n\n");
+        return;
+    }
+
     List *listaProductos = pair->value;
     tipoProducto *producto = firstList(listaProductos);
-    int cont = 0;
-
     while(producto)
     {
         mostrarInfoProducto(producto);
         producto = nextList(listaProductos);
-        cont++;
     }
-
-    if(cont == 0)
-        printf("No se encontraron productos de la marca ingresada\n");    
 }
 
 void buscarProductosNombre(HashMap* mapa, char* nombre)

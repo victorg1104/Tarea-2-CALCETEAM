@@ -106,14 +106,14 @@ int main()
                 fflush(stdin);
                 printf("Ingrese el nombre del archivo: ");
                 scanf("%[^\n]", nombre);
-                importarCanciones(nombre);
+                importarProductos(nombre);
             break;
 
             case 2: // Exportar productos
                 fflush(stdin);
                 printf("Ingrese el nombre del archivo: ");
                 scanf("%[^\n]", nombre);
-                exportarCanciones(nombre);
+                exportarProductos(nombre);
                 break;
 
             case 3:
@@ -140,6 +140,13 @@ int main()
                 fflush(stdin);
                 buscarProductosTipo(mapaTipo, tipo);
                 break;
+
+            case 5:
+                printf("Ingrese la marca del producto: ");
+                scanf("%[^\n]", marca);
+                fflush(stdin);
+                buscarProductosMarca(mapaMarca, marca);
+                break;                
 
             case 6:
                 printf("ingrese el nombre del producto: ");
@@ -241,7 +248,7 @@ void importarProductos(char* nombreArchivo)
         char *tipo = get_csv_field(linea, 2);
         char *marca = get_csv_field(linea, 1);
         int stock = atoi(get_csv_field(linea, 3));
-        int precio = get_csv_field(linea, 4);
+        int precio = atoi(get_csv_field(linea, 4));
 
         agregarProducto(nombre, tipo, marca, stock, precio);
     }
@@ -259,12 +266,14 @@ void exportarProductos(char *nombreArchivo)
         return;
     }
 
-    tipoProducto* producto = firstMap(mapaNombre); 
-    while(producto)
+    Pair *pair = firstMap(mapaNombre);
+    tipoProducto *producto;
+    while(pair)
     {
+        producto = pair->value;
         fprintf(archivo, "%s,%s,%s,%d,%d", producto->nombre, producto->marca, producto->tipo, producto->stock, producto->precio);
 
-        producto = nextMap(mapaNombre);
+        pair = nextMap(mapaNombre);
     }
 
     fclose(archivo);
@@ -339,6 +348,24 @@ void buscarProductosTipo(HashMap *map, char *tipo)
 
     if(cont == 0)
         printf("No se encontraron productos del tipo ingresado\n");
+}
+
+void buscarProductosMarca(HashMap* map, char* marca)
+{
+    Pair *pair = searchMap(map, marca);
+    List *listaProductos = pair->value;
+    tipoProducto *producto = firstList(listaProductos);
+    int cont = 0;
+
+    while(producto)
+    {
+        mostrarInfoProducto(producto);
+        producto = nextList(listaProductos);
+        cont++;
+    }
+
+    if(cont == 0)
+        printf("No se encontraron productos de la marca ingresada\n");    
 }
 
 void buscarProductosNombre(HashMap* mapa, char* nombre)

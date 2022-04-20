@@ -271,8 +271,8 @@ void exportarProductos(char *nombreArchivo)
     while(pair)
     {
         producto = pair->value;
-        fprintf(archivo, "%s,%s,%s,%d,%d", producto->nombre, producto->marca, producto->tipo, producto->stock, producto->precio);
-
+        fprintf(archivo, "%s,%s,%s,", producto->nombre, producto->marca, producto->tipo);
+        fprintf(archivo, "%d,%d\n", producto->stock, producto->precio);
         pair = nextMap(mapaNombre);
     }
 

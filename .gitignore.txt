@@ -1,4 +1,0 @@
-*.exe
-*.csv
-.settings/
-.vscode/settings.json

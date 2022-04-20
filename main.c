@@ -8,7 +8,7 @@
 
 typedef struct
 {
-    char nombre [30];
+    char nombre [60];
     char tipo [30];
     char marca [30];
     int stock;
@@ -17,7 +17,7 @@ typedef struct
 
 typedef struct
 {
-    char nombre [30];
+    char nombre [60];
     int cantidad;
 } tipoProductoCompra;
 
@@ -70,14 +70,14 @@ int main()
     mapaNombre = createMap(200);
     mapaCarritos = createMap(200);
 
-    char nombreProducto [30];
+    char nombreProducto [60];
     char tipo [30];
     char marca [30];
-    char nombre [30];
     int stock;
     int precio;
     char nombreCarrito [30];
     int cantidad;
+    char nombreArchivo [30];
 
     int opcion = 0;
 
@@ -105,15 +105,15 @@ int main()
             case 1:// Importar productos
                 fflush(stdin);
                 printf("Ingrese el nombre del archivo: ");
-                scanf("%[^\n]", nombre);
-                importarProductos(nombre);
+                scanf("%[^\n]", nombreArchivo);
+                importarProductos(nombreArchivo);
             break;
 
             case 2: // Exportar productos
                 fflush(stdin);
                 printf("Ingrese el nombre del archivo: ");
-                scanf("%[^\n]", nombre);
-                exportarProductos(nombre);
+                scanf("%[^\n]", nombreArchivo);
+                exportarProductos(nombreArchivo);
                 break;
 
             case 3:
@@ -149,10 +149,10 @@ int main()
                 break;                
 
             case 6:
-                printf("ingrese el nombre del producto: ");
-                scanf("%[^\n]", nombre);
+                printf("Ingrese el nombre del producto: ");
+                scanf("%[^\n]", nombreProducto);
                 fflush(stdin);
-                buscarProductosNombre(mapaNombre, nombre);
+                buscarProductosNombre(mapaNombre, nombreProducto);
             break;
 
             case 8:

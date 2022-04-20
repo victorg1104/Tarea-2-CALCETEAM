@@ -371,19 +371,15 @@ void buscarProductosMarca(HashMap* map, char* marca)
 void buscarProductosNombre(HashMap* mapa, char* nombre)
 {
     Pair* pair = searchMap(mapa, nombre);
-    List* listaProductos = pair->value;
-    tipoProducto* producto = firstList(listaProductos);
-    int cont = 0;
-
-    while (producto)
+    if(pair)
     {
+        tipoProducto *producto = pair->value;
         mostrarInfoProducto(producto);
-        producto = nextList(listaProductos);
-        cont++;
     }
-
-    if(cont == 0)
-        printf("No se encontraron productos con el nombre ingresado\n");
+    else
+    {
+        printf("No se encontró un producto con el nombre ingresado\n\n");
+    }
 }
 
 void mostrarInfoProducto(tipoProducto *producto)

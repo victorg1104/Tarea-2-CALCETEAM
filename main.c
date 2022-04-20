@@ -133,12 +133,21 @@ int main()
                 agregarProducto(nombreProducto, tipo, marca, stock, precio);
                 printf("\n");
                 break;
+
             case 4:
                 printf("Ingrese el tipo de producto: ");
                 scanf("%[^\n]", tipo);
                 fflush(stdin);
                 buscarProductosTipo(mapaTipo, tipo);
                 break;
+
+            case 6:
+                printf("ingrese el nombre del producto: ");
+                scanf("%[^\n]", nombre);
+                fflush(stdin);
+                buscarProductosNombre(mapaNombre, nombre);
+            break;
+
             case 8:
                 printf("Ingrese el nombre del producto: ");
                 scanf("%[^\n]", nombreProducto);
@@ -234,20 +243,7 @@ void importarProductos(char* nombreArchivo)
         int stock = atoi(get_csv_field(linea, 3));
         int precio = get_csv_field(linea, 4);
 
-        pair = searchMap(mapaNombre, nombre);
-
-        if (pair)
-        {
-            aux = (tipoProducto*) pair->value;
-            aux->stock += stock;
-        }
-        else
-        {
-            aux = crearProducto(nombre, tipo, marca, stock, precio);
-            insertMap(mapaNombre, aux->nombre, aux);
-            insertMap(mapaMarca, aux->marca, aux);
-            insertMap(mapaTipo, aux->tipo, aux);
-        }
+        agregarProducto(nombre, tipo, marca, stock, precio);
     }
 
     fclose(archivoEntrada);
@@ -332,11 +328,35 @@ void buscarProductosTipo(HashMap *map, char *tipo)
     Pair *pair = searchMap(map, tipo);
     List *listaProductos = pair->value;
     tipoProducto *producto = firstList(listaProductos);
+    int cont = 0;
+
     while(producto)
     {
         mostrarInfoProducto(producto);
         producto = nextList(listaProductos);
+        cont++;
     }
+
+    if(cont == 0)
+        printf("No se encontraron productos del tipo ingresado\n");
+}
+
+void buscarProductosNombre(HashMap* mapa, char* nombre)
+{
+    Pair* pair = searchMap(mapa, nombre);
+    List* listaProductos = pair->value;
+    tipoProducto* producto = firstList(listaProductos);
+    int cont = 0;
+
+    while (producto)
+    {
+        mostrarInfoProducto(producto);
+        producto = nextList(listaProductos);
+        cont++;
+    }
+
+    if(cont == 0)
+        printf("No se encontraron productos con el nombre ingresado\n");
 }
 
 void mostrarInfoProducto(tipoProducto *producto)

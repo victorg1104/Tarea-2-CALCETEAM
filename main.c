@@ -52,6 +52,8 @@ void concretarCompra(char* carrito);
 
 void mostrarCarritos();
 
+void mostrarTotalProductos();
+
 // Funciones auxiliares
 void mostrarInfoProducto(tipoProducto *producto);
 tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, int stock, int precio);
@@ -117,6 +119,7 @@ int main()
                 break;
 
             case 3:
+                fflush(stdin);
                 printf("Ingrese el nombre del producto: ");
                 scanf("%[^\n]", nombreProducto);
                 fflush(stdin);
@@ -135,6 +138,7 @@ int main()
                 break;
 
             case 4:
+                fflush(stdin);
                 printf("Ingrese el tipo de producto: ");
                 scanf("%[^\n]", tipo);
                 fflush(stdin);
@@ -142,6 +146,7 @@ int main()
                 break;
 
             case 5:
+                fflush(stdin);
                 printf("Ingrese la marca del producto: ");
                 scanf("%[^\n]", marca);
                 fflush(stdin);
@@ -149,11 +154,16 @@ int main()
                 break;                
 
             case 6:
+                fflush(stdin);
                 printf("Ingrese el nombre del producto: ");
                 scanf("%[^\n]", nombreProducto);
                 fflush(stdin);
                 buscarProductosNombre(mapaNombre, nombreProducto);
             break;
+
+            case 7:
+                mostrarTotalProductos();
+                break;
 
             case 8:
                 printf("Ingrese el nombre del producto: ");
@@ -181,6 +191,20 @@ int main()
     }
 
     return 0;
+}
+
+void mostrarTotalProductos()
+{
+    Pair *pairAux = firstMap(mapaNombre);
+    tipoProducto *productoAux = pairAux->value;
+    while(pairAux)
+    {
+        mostrarInfoProducto(productoAux);
+        pairAux = nextMap(mapaNombre);
+        productoAux = pairAux->value;
+    } else {
+        return
+    }
 }
 
 char *get_csv_field(char *linea, int indice)

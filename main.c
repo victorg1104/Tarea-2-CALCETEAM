@@ -197,14 +197,18 @@ int main()
 void mostrarTotalProductos()
 {
     Pair *pairAux = firstMap(mapaNombre);
-    tipoProducto *productoAux = pairAux->value;
+    if(!pairAux)
+    {
+        printf("No hay productos para mostrar.\n\n");
+        return;
+    }
+
+    tipoProducto *productoAux;
     while(pairAux)
     {
+        productoAux = pairAux->value;
         mostrarInfoProducto(productoAux);
         pairAux = nextMap(mapaNombre);
-        productoAux = pairAux->value;
-    } else {
-        return
     }
 }
 

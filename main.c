@@ -193,6 +193,7 @@ int main()
     return 0;
 }
 
+// NOTA: Esta función falla en cierto punto (segmentation fault)
 void mostrarTotalProductos()
 {
     Pair *pairAux = firstMap(mapaNombre);
@@ -458,6 +459,7 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
     printf("Se agregó el producto al carrito.\n\n");
 }
 
+// NOTA: Esta función falla en cierto punto (segmentation fault)
 void concretarCompra(char* nombreCarrito)
 {
     Pair* pair;

@@ -17,7 +17,7 @@ typedef struct
 
 typedef struct
 {
-    char nombre [60];
+    tipoProducto *producto;
     int cantidad;
 } tipoProductoCompra;
 
@@ -193,7 +193,6 @@ int main()
     return 0;
 }
 
-// NOTA: Esta función falla en cierto punto (segmentation fault)
 void mostrarTotalProductos()
 {
     Pair *pairAux = firstMap(mapaNombre);
@@ -447,7 +446,7 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
     }
 
     tipoProductoCompra *productoCompra = (tipoProductoCompra*) malloc(sizeof(tipoProductoCompra));
-    strcpy(productoCompra->nombre, nombreProducto);
+    productoCompra->producto = producto;
     productoCompra->cantidad = cantidad;
 
     pair = searchMap(mapaCarritos, nombreCarrito);
@@ -463,57 +462,44 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
     printf("Se agregó el producto al carrito.\n\n");
 }
 
-// NOTA: Esta función falla en cierto punto (segmentation fault)
 void concretarCompra(char* nombreCarrito)
 {
-    Pair* pair;
-    tipoCarrito* carrito;
-    tipoProductoCompra* productoCarrito;
-    tipoProducto* productoStock;
-    int respuesta;
-    int cont = 0;
+    Pair *pair = searchMap(mapaCarritos, nombreCarrito);
 
-    pair = searchMap(mapaCarritos, nombreCarrito);
-
-    if(pair)
+    if(!pair)
     {
-        carrito = pair->value;
-
-        printf("Total a pagar: %d\n", carrito->precioTotal);
-
-        printf("Productos dentro del carrito: \n");
-
-        while (cont < carrito->cantidadProductos);
-        {
-            productoCarrito = (tipoProductoCompra *) firstList(carrito->listaProductos);
-
-            if(productoCarrito != NULL)
-            {
-                productoStock = (tipoProducto *) searchMap(mapaNombre, productoCarrito->nombre);
-
-                printf("-%s, cantidad: %d\n", productoCarrito->nombre, productoCarrito->cantidad);
-
-                productoStock->stock -= productoCarrito->cantidad;
-                popFront(carrito->listaProductos);
-
-                cont++;
-            }
-        }
-
-        if (carrito->cantidadProductos == 0)
-            printf("El carrito está vacío");
-        
-        if(carrito->cantidadProductos != 0)
-        {
-            printf("¿Quiere concretar la compra?\n");
-            printf("1.- Sí // 2.- No");
-            scanf("%d", &respuesta);
-        }
-
-        if(respuesta == 1)
-            eraseMap(mapaCarritos, nombreCarrito);
+        printf("No se encontró el carrito buscado\n\n");
+        return;
     }
-    else
-        printf("No se encontró el carrito buscado");
-    
+
+    tipoCarrito *carrito = pair->value;
+    if(carrito->cantidadProductos == 0) {
+        printf("El carrito está vacío\n\n");
+        return;
+    }
+
+    int respuesta;
+    printf("\n¿Quiere concretar la compra?\n");
+    printf("1.- Sí // 2.- No\n");
+    printf("Ingrese la opción: ");
+    scanf("%d", &respuesta);
+
+    if(respuesta != 1) return;
+
+    printf("\nTotal a pagar: %d\n", carrito->precioTotal);
+    printf("Productos dentro del carrito: \n");
+
+    List *listaProductosCarrito = carrito->listaProductos;
+    tipoProductoCompra *productoCarrito = firstList(listaProductosCarrito);
+
+    while (productoCarrito);
+    {
+        printf("- %s, ", productoCarrito->producto->nombre);
+        printf("cantidad: %d\n", productoCarrito->cantidad);
+
+        productoCarrito->producto->stock -= productoCarrito->cantidad;
+        productoCarrito = nextList(listaProductosCarrito);
+    }
+    eraseMap(mapaCarritos, nombreCarrito);
+    printf("\n");
 }

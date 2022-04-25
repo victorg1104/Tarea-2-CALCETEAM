@@ -1,2 +1,4 @@
 # Tarea-2
-anashei calceteam
+
+# Compilar con
+gcc main.c hashmap.c list.c -o main

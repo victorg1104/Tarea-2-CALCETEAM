@@ -492,7 +492,7 @@ void concretarCompra(char* nombreCarrito)
     List *listaProductosCarrito = carrito->listaProductos;
     tipoProductoCompra *productoCarrito = firstList(listaProductosCarrito);
 
-    while (productoCarrito);
+    while(productoCarrito)
     {
         printf("- %s, ", productoCarrito->producto->nombre);
         printf("cantidad: %d\n", productoCarrito->cantidad);

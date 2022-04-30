@@ -469,7 +469,7 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
     pushFront(carrito->listaProductos, productoCompra);
     carrito->cantidadProductos++;
     carrito->precioTotal += (cantidad * producto->precio);
-    printf("\nSe agregó el producto al carrito.\n\n");
+    printf("Se agregó el producto al carrito.\n\n");
 }
 
 void eliminarProductoCarrito(char* nombreCarrito)
@@ -477,7 +477,7 @@ void eliminarProductoCarrito(char* nombreCarrito)
     Pair* pair = searchMap(mapaCarritos, nombreCarrito);
 
     if(!pair){
-        printf("\nEl carrito ingresado no existe.\n");
+        printf("El carrito ingresado no existe.\n\n");
     }
     else{
         tipoCarrito* carrito = pair->value;
@@ -504,8 +504,8 @@ void mostrarCarritos()
     while(pair != NULL){
         tipoCarrito* cant = pair->value;
         if(cant->cantidadProductos > 0){
-            printf("\nNombre del carrito: %s - ", pair->key);
-            printf("%d producto/s.\n", cant->cantidadProductos);
+            printf("\nNombre del carrito: %s\n", pair->key);
+            printf("Cantidad de productos: %d\n", cant->cantidadProductos);
         }
         pair = nextMap(mapaCarritos);
     }

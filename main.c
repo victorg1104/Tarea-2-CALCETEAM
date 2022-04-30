@@ -91,7 +91,7 @@ int main()
         printf("4.-  Buscar producto por tipo\n");
         printf("5.-  Buscar producto por marca\n");
         printf("6.-  Buscar producto por nombre\n");
-        printf("7.-  Mostrar todos los productos diponibles\n");
+        printf("7.-  Mostrar todos los productos disponibles\n");
         printf("8.-  Agregar producto a un carrito\n");
         printf("9.-  Eliminar producto de un carrito\n");
         printf("10.- Concretar compra\n");
@@ -528,28 +528,35 @@ void concretarCompra(char* nombreCarrito)
         return;
     }
 
-    int respuesta;
-    printf("\n¿Quiere concretar la compra?\n");
-    printf("1.- Sí // 2.- No\n");
-    printf("Ingrese la opción: ");
-    scanf("%d", &respuesta);
-
-    if(respuesta != 1) return;
-
     printf("\nTotal a pagar: %d\n", carrito->precioTotal);
     printf("Productos dentro del carrito: \n");
 
     List *listaProductosCarrito = carrito->listaProductos;
     tipoProductoCompra *productoCarrito = firstList(listaProductosCarrito);
 
+    // Se recorre el carrito para mostrar los productos
     while(productoCarrito)
     {
         printf("- %s, ", productoCarrito->producto->nombre);
         printf("cantidad: %d\n", productoCarrito->cantidad);
+        productoCarrito = nextList(listaProductosCarrito);
+    }
 
+    int respuesta;
+    printf("\n¿Quiere concretar la compra?\n");
+    printf("1.- Sí // 2.- No\n");
+    printf("Ingrese la opción: ");
+    scanf("%d", &respuesta);
+    printf("\n");
+
+    if(respuesta != 1) return;
+
+    // Se recorre nuevamente el carrito para reducir el stock
+    productoCarrito = firstList(listaProductosCarrito);
+    while(productoCarrito)
+    {
         productoCarrito->producto->stock -= productoCarrito->cantidad;
         productoCarrito = nextList(listaProductosCarrito);
     }
     eraseMap(mapaCarritos, nombreCarrito);
-    printf("\n");
 }

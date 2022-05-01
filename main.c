@@ -67,6 +67,7 @@ HashMap* mapaCarritos;
 
 int main()
 {
+    // Mapas globales para la busqueda
     mapaTipo = createMap(200);
     mapaMarca = createMap(200);
     mapaNombre = createMap(200);
@@ -292,7 +293,7 @@ void importarProductos(char* nombreArchivo)
     }
 
     fclose(archivoEntrada);
-    printf("\n");
+    printf("Productos importados correctamente.\n\n");
 }
 
 void exportarProductos(char *nombreArchivo)
@@ -466,7 +467,8 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
     {
         carrito = pair->value;
     }
-    else{
+    else
+    {
         carrito = crearCarrito(nombreCarrito);
     }
 
@@ -475,27 +477,23 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
 
     while (aux)
     {
-        printf("entra al while");
         if(strcmp(productoCompra->producto->nombre, aux->producto->nombre) == 0)
         {
-            printf("entra al compare");
             aux->cantidad += productoCompra->cantidad;
             esta = true;
             break;
         }
-        printf("entra");
         aux = nextList(carrito->listaProductos);
     }
 
     if(esta == false) 
     {
-        printf("entra en el if");
         pushFront(carrito->listaProductos, productoCompra);
         carrito->cantidadProductos++;
     }
 
     carrito->precioTotal += (cantidad * producto->precio);
-    printf("Se agregó el producto al carrito.\n\n");
+    printf("Se agrego el producto al carrito.\n\n");
 }
 
 void eliminarProductoCarrito(char* nombreCarrito)
@@ -582,7 +580,7 @@ void concretarCompra(char* nombreCarrito)
 
     int respuesta;
     printf("\n¿Quiere concretar la compra?\n");
-    printf("1.- Sí // 2.- No\n");
+    printf("1.- Si // 2.- No\n");
     printf("Ingrese la opción: ");
     scanf("%d", &respuesta);
     printf("\n");

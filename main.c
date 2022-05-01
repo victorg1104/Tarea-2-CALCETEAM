@@ -461,13 +461,39 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
 
     pair = searchMap(mapaCarritos, nombreCarrito);
     tipoCarrito *carrito;
-    if(pair)
-        carrito = pair->value;
-    else
-        carrito = crearCarrito(nombreCarrito);
 
-    pushFront(carrito->listaProductos, productoCompra);
-    carrito->cantidadProductos++;
+    if(pair)
+    {
+        carrito = pair->value;
+    }
+    else{
+        carrito = crearCarrito(nombreCarrito);
+    }
+
+    tipoProductoCompra* aux = firstList(carrito->listaProductos);
+    bool esta = false;
+
+    while (aux)
+    {
+        printf("entra al while");
+        if(strcmp(productoCompra->producto->nombre, aux->producto->nombre) == 0)
+        {
+            printf("entra al compare");
+            aux->cantidad += productoCompra->cantidad;
+            esta = true;
+            break;
+        }
+        printf("entra");
+        aux = nextList(carrito->listaProductos);
+    }
+
+    if(esta == false) 
+    {
+        printf("entra en el if");
+        pushFront(carrito->listaProductos, productoCompra);
+        carrito->cantidadProductos++;
+    }
+
     carrito->precioTotal += (cantidad * producto->precio);
     printf("Se agregó el producto al carrito.\n\n");
 }
@@ -476,11 +502,14 @@ void eliminarProductoCarrito(char* nombreCarrito)
 {
     Pair* pair = searchMap(mapaCarritos, nombreCarrito);
 
+    // Se verifica si se encontró el carrito en el mapaCarritos
     if(!pair){
         printf("El carrito ingresado no existe.\n\n");
     }
     else{
         tipoCarrito* carrito = pair->value;
+
+        // Si el carrito contiene productos se elimina el ultimo ingresado
         if(carrito->cantidadProductos > 0 ){
             popFront(carrito->listaProductos);
             carrito->cantidadProductos--;
@@ -496,14 +525,22 @@ void mostrarCarritos()
 {
     Pair* pair = firstMap(mapaCarritos);
 
+    // Se verifica que el mapaCarritos sea NULL
     if(pair == NULL){
         printf("No hay carritos creados.\n");
     }
 
+    // Se recorre el mapaCarritos imprimendo la información
     tipoCarrito *carrito;
     while(pair)
     {
         carrito = pair->value;
+
+        if(carrito->cantidadProductos == 0){
+            printf("\nNombre del carrito: %s\n", pair->key);
+            printf("Cantidad de productos: vacio\n");
+        }
+
         if(carrito->cantidadProductos > 0){
             printf("\nNombre del carrito: %s\n", pair->key);
             printf("Cantidad de productos: %d\n", carrito->cantidadProductos);

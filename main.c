@@ -494,18 +494,19 @@ void eliminarProductoCarrito(char* nombreCarrito)
 
 void mostrarCarritos()
 {
-
     Pair* pair = firstMap(mapaCarritos);
 
     if(pair == NULL){
         printf("No hay carritos creados.\n");
     }
 
-    while(pair != NULL){
-        tipoCarrito* cant = pair->value;
-        if(cant->cantidadProductos > 0){
+    tipoCarrito *carrito;
+    while(pair)
+    {
+        carrito = pair->value;
+        if(carrito->cantidadProductos > 0){
             printf("\nNombre del carrito: %s\n", pair->key);
-            printf("Cantidad de productos: %d\n", cant->cantidadProductos);
+            printf("Cantidad de productos: %d\n", carrito->cantidadProductos);
         }
         pair = nextMap(mapaCarritos);
     }

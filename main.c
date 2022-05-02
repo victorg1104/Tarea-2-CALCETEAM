@@ -69,6 +69,7 @@ int main()
     mapaNombre = createMap(200);
     mapaCarritos = createMap(200);
 
+    // Variables auxiliares para c/opción del menú
     char nombreProducto [60];
     char tipo [30];
     char marca [30];
@@ -269,11 +270,12 @@ char *get_csv_field(char *linea, int indice)
 
 void importarProductos(char* nombreArchivo)
 {
+    // Variables auxiliares
     FILE* archivoEntrada;
     Pair* pair;
     tipoProducto* aux;
 
-    archivoEntrada = fopen(nombreArchivo, "r");
+    archivoEntrada = fopen(nombreArchivo, "r"); // Abrimos el archivo csv en modo lectura
 
     if(archivoEntrada == NULL)
     {
@@ -281,16 +283,17 @@ void importarProductos(char* nombreArchivo)
         exit(EXIT_FAILURE);
     }
 
-    char linea[1024];
+    char linea[1024]; // String donde almacenaremos cada linea del archivo
 
+    // Iteramos cada linea hasta llegar al final del archivo
     while (fgets (linea, 1023, archivoEntrada) != NULL) 
     {
         // Se guardan los datos según el campo que se recibe
         char *nombre = get_csv_field(linea, 0);
         char *tipo = get_csv_field(linea, 2);
         char *marca = get_csv_field(linea, 1);
-        int stock = atoi(get_csv_field(linea, 3));
-        int precio = atoi(get_csv_field(linea, 4));
+        int stock = atoi(get_csv_field(linea, 3));  // Pasamos el string a entero
+        int precio = atoi(get_csv_field(linea, 4)); // Pasamos el string a entero
 
         agregarProducto(nombre, tipo, marca, stock, precio);
     }
@@ -301,20 +304,27 @@ void importarProductos(char* nombreArchivo)
 
 void exportarProductos(char *nombreArchivo)
 {
-    FILE *archivo = fopen(nombreArchivo, "w"); 
+    FILE *archivo = fopen(nombreArchivo, "w"); // Abrimos el archivo destino en modo escritura
+    
     if(!archivo)
     {
         printf("No se pudo crear el archivo\n");
         return;
     }
 
+    // Creamos un par auxiliar para iterar desde el primer elemento del mapa
     Pair *pair = firstMap(mapaNombre);
+
     tipoProducto *producto;
+
+    // Iteramos por todo el mapa
     while(pair)
     {
         producto = pair->value;
+
         fprintf(archivo, "%s,%s,%s,", producto->nombre, producto->marca, producto->tipo);
         fprintf(archivo, "%d,%d\n", producto->stock, producto->precio);
+
         pair = nextMap(mapaNombre);
     }
 
@@ -335,38 +345,48 @@ tipoProducto *crearProducto(char* nombre, char* tipo, char* marca, int stock, in
 
 void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int precio)
 {
-    Pair *pair = searchMap(mapaNombre, nombre);
+    Pair *pair = searchMap(mapaNombre, nombre); // Buscamos si el producto ya existe en el mapa con clave Nombres
     if(pair)
     {
+        // Si ya existe, aumentamos el stock
         tipoProducto *producto = pair->value;
         producto->stock += stock;
     }
     else
     {
+        // Si no existe, lo creamos y lo insertamos en el mapa
         tipoProducto *producto = crearProducto(nombre, tipo, marca, stock, precio);
         insertMap(mapaNombre, nombre, producto);
 
+        // Buscamos si el producto ya existe en el mapa con clave Tipo
         pair = searchMap(mapaTipo, tipo);
         if(pair)
         {
+            // Si ya existe, lo insertamos en la lista
+            // Usamos una lista ya que un producto con el mismo nombre puede tener varios tipos
             List *listaTipo = pair->value;
             pushFront(listaTipo, producto);
         }
         else
         {
+            // Si no existe, creamos la lista, insertamos el producto en ella e insertamos la lista en el mapa con clave Tipo
             List *listaTipo = createList();
             pushFront(listaTipo, producto);
             insertMap(mapaTipo, tipo, listaTipo);
         }
 
+        // Buscamos si el producto ya existe en el mapa con clave Marca
         pair = searchMap(mapaMarca, marca);
         if(pair)
         {
+            // Si ya existe, lo insertamos en la lista
+            // Usamos una lista ya que un mismo producto puede tener varias marcas
             List *listaMarca = pair->value;
             pushFront(listaMarca, producto);
         }
         else
         {
+            // Si no existe, creamos la lista, insertamos el producto en ella e insertamos la lista en el mapa con clave Marca
             List *listaMarca = createList();
             pushFront(listaMarca, producto);
             insertMap(mapaMarca, marca, listaMarca);

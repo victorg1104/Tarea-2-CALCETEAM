@@ -36,9 +36,7 @@ void exportarProductos(char* nombreArchivo);
 
 void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int precio);
 
-void buscarProductosTipo(HashMap* map, char* tipo);
-
-void buscarProductosMarca(HashMap* map, char* marca);
+void buscarProductosLista(HashMap* map, char* clave);
 
 void buscarProductosNombre(HashMap* map, char* nombre);
 
@@ -51,8 +49,6 @@ void eliminarProductoCarrito(char* carrito);
 void concretarCompra(char* carrito);
 
 void mostrarCarritos();
-
-void mostrarTotalProductos();
 
 // Funciones auxiliares
 void mostrarInfoProducto(tipoProducto *producto);
@@ -143,7 +139,7 @@ int main()
                 printf("Ingrese el tipo de producto: ");
                 scanf("%[^\n]", tipo);
                 fflush(stdin);
-                buscarProductosTipo(mapaTipo, tipo);
+                buscarProductosLista(mapaTipo, tipo);
                 break;
 
             case 5:
@@ -151,7 +147,7 @@ int main()
                 printf("Ingrese la marca del producto: ");
                 scanf("%[^\n]", marca);
                 fflush(stdin);
-                buscarProductosMarca(mapaMarca, marca);
+                buscarProductosLista(mapaMarca, marca);
                 break;                
 
             case 6:
@@ -163,7 +159,7 @@ int main()
             break;
 
             case 7:
-                mostrarTotalProductos();
+                mostrarProductos(mapaNombre);
                 break;
 
             case 8:
@@ -196,6 +192,7 @@ int main()
             case 11:
                 mostrarCarritos();
                 break;
+
             case 12: 
                 exit(EXIT_SUCCESS); // Salir de la aplicacion
         }
@@ -204,21 +201,27 @@ int main()
     return 0;
 }
 
-void mostrarTotalProductos()
+void mostrarProductos(HashMap* map)
 {
-    Pair *pairAux = firstMap(mapaNombre);
+    // Accedemos al primer elemento del mapa para iterar sobre el
+    Pair *pairAux = firstMap(map);
+
+    // Si pairAux no existe, el mapa está vacío
     if(!pairAux)
     {
         printf("No hay productos para mostrar.\n\n");
         return;
     }
 
+    // Creamos un producto auxiliar para imprimir su información
     tipoProducto *productoAux;
+
+    // Mientras pairAux sea distinto a NULL
     while(pairAux)
     {
         productoAux = pairAux->value;
-        mostrarInfoProducto(productoAux);
-        pairAux = nextMap(mapaNombre);
+        mostrarInfoProducto(productoAux); // Imprimimos el producto actual
+        pairAux = nextMap(map);    // Siguiente producto en el mapa de clave Nombre
     }
 }
 
@@ -371,30 +374,12 @@ void agregarProducto(char* nombre, char* tipo, char* marca, int stock, int preci
     }
 }
 
-void buscarProductosTipo(HashMap *map, char *tipo)
+void buscarProductosLista(HashMap* map, char* clave)
 {
-    Pair *pair = searchMap(map, tipo);
+    Pair *pair = searchMap(map, clave);
     if(!pair)
     {
-        printf("No se encontraron productos del tipo ingresado\n\n");
-        return;
-    }
-
-    List *listaProductos = pair->value;
-    tipoProducto *producto = firstList(listaProductos);
-    while(producto)
-    {
-        mostrarInfoProducto(producto);
-        producto = nextList(listaProductos);
-    }
-}
-
-void buscarProductosMarca(HashMap* map, char* marca)
-{
-    Pair *pair = searchMap(map, marca);
-    if(!pair)
-    {
-        printf("No se encontraron productos de la marca ingresada\n\n");
+        printf("No se encontraron productos que coincidan\n\n");
         return;
     }
 
@@ -473,20 +458,20 @@ void agregarProductoCarrito(char *nombreProducto, int cantidad, char *nombreCarr
     }
 
     tipoProductoCompra* aux = firstList(carrito->listaProductos);
-    bool esta = false;
+    bool existe = false;
 
     while (aux)
     {
         if(strcmp(productoCompra->producto->nombre, aux->producto->nombre) == 0)
         {
             aux->cantidad += productoCompra->cantidad;
-            esta = true;
+            existe = true;
             break;
         }
         aux = nextList(carrito->listaProductos);
     }
 
-    if(esta == false) 
+    if(existe == false) 
     {
         pushFront(carrito->listaProductos, productoCompra);
         carrito->cantidadProductos++;
